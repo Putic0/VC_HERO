@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
+intentional_disconnect = False
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -52,8 +53,11 @@ async def leave(ctx):
         return await ctx.send("❌ I'm not in any voice channel.")
 
     channel_name = ctx.voice_client.channel.name
+    global intentional_disconnect
+    intentional_disconnect = True
     await ctx.voice_client.disconnect()
     await ctx.send(f"👋 Left **{channel_name}**.")
+
 
 
 @bot.command(name="move")
@@ -137,8 +141,17 @@ async def on_voice_state_update(member, before, after):
     If the bot gets unexpectedly disconnected (Discord timeout),
     attempt to reconnect to the channel it was in.
     """
+    global intentional_disconnect
+    if intentional_disconnect:
+    intentional_disconnect = False
+    return
+
     if member.id != bot.user.id:
         return  # Only care about the bot's own state
+        global intentional_disconnect
+    if intentional_disconnect:
+        intentional_disconnect = False
+        return
 
     # Bot was disconnected (had a channel before, has none now)
     if before.channel is not None and after.channel is None:
