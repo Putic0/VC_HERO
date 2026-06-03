@@ -31,6 +31,15 @@ async def join(ctx):
         await ctx.send(f"🔄 Moved to **{channel.name}**")
     else:
         await channel.connect()
+        def play_audio(error):
+    if ctx.voice_client and ctx.voice_client.is_connected():
+        import time
+        time.sleep(5)
+        source = discord.FFmpegPCMAudio('ambatu.mp3')
+        ctx.voice_client.play(source, after=play_audio)
+
+source = discord.FFmpegPCMAudio('ambatu.mp3')
+ctx.voice_client.play(source, after=play_audio)
         await ctx.send(f"🎙️ Joined **{channel.name}** — I'll stay even if I'm alone.")
         await bot.change_presence(activity=discord.Game(name=f"Saving {channel.name}"))
 
