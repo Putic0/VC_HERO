@@ -32,7 +32,7 @@ async def join(ctx):
     else:
         await channel.connect()
         await ctx.send(f"🎙️ Joined **{channel.name}** — I'll stay even if I'm alone.")
-        await bot.change_presence(activity=discord.Game(name="Saving {channel.name}"))
+        await bot.change_presence(activity=discord.Game(name=f"Saving {channel.name}"))
 
 @bot.command(name="leave", aliases=["disconnect", "dc"])
 async def leave(ctx):
