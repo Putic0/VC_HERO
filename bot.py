@@ -32,7 +32,7 @@ async def join(ctx):
     else:
         await channel.connect()
         await ctx.send(f"🎙️ Joined **{channel.name}** — I'll stay even if I'm alone.")
-        await bot.change_presence(activity=discord.Game(name="Limbus Company"))
+        await bot.change_presence(activity=discord.Game(name="Saving {channel.name}"))
 
 @bot.command(name="leave", aliases=["disconnect", "dc"])
 async def leave(ctx):
@@ -44,6 +44,8 @@ async def leave(ctx):
     channel_name = ctx.voice_client.channel.name
     await ctx.voice_client.disconnect()
     await ctx.send(f"👋 Left **{channel_name}**.")
+    await ctx.send(f"I leave the vc to you now...! https://tenor.com/view/spider-man-edit-funk-raphyx-spiderman-gif-1582522054178700448")
+    await bot.change_presence(activity=None)
 
 
 @bot.command(name="move")
@@ -106,6 +108,7 @@ async def on_voice_state_update(member, before, after):
             print(f"✅ Reconnected to '{before.channel.name}'")
         except Exception as e:
             print(f"❌ Could not reconnect: {e}")
+            await bot.change_presence(activity=None)
 
 
 if __name__ == "__main__":
