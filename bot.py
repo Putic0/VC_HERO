@@ -1,5 +1,4 @@
 import discord
-from discord import client
 from discord.ext import commands
 import asyncio
 import os
@@ -33,7 +32,7 @@ async def join(ctx):
     else:
         await channel.connect()
         await ctx.send(f"🎙️ Joined **{channel.name}** — I'll stay even if I'm alone.")
-        await client.change_presence(status=discord.Status.idle, activity="Limbus Company")
+        await bot.change_presence(activity="Limbus Company")
 
 @bot.command(name="leave", aliases=["disconnect", "dc"])
 async def leave(ctx):
