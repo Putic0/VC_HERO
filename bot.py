@@ -1,11 +1,7 @@
 import discord
 from discord.ext import commands
-from discord import app_commands
 import asyncio
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 intentional_disconnect = False
@@ -21,18 +17,10 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f"✅ Bot connected as: {bot.user}")
     print(f"🔗 In {len(bot.guilds)} server(s)")
-    try:
-        synced = await bot.tree.sync()
-        print(f"⚙️  {len(synced)} slash commands synced")
-    except Exception as e:
-        print(f"Error syncing commands: {e}")
 
-
-# ─── Prefix Commands (!join, !leave, etc.) ──────────────────────────────────
 
 @bot.command(name="join", aliases=["connect"])
 async def join(ctx):
-    """Join the voice channel the user is in."""
     if ctx.author.voice is None:
         return await ctx.send("❌ You need to be in a voice channel first.")
 
@@ -48,21 +36,18 @@ async def join(ctx):
 
 @bot.command(name="leave", aliases=["disconnect", "dc"])
 async def leave(ctx):
-    """Disconnect the bot from the voice channel."""
     if ctx.voice_client is None:
         return await ctx.send("❌ I'm not in any voice channel.")
 
-    channel_name = ctx.voice_client.channel.name
     global intentional_disconnect
     intentional_disconnect = True
+    channel_name = ctx.voice_client.channel.name
     await ctx.voice_client.disconnect()
     await ctx.send(f"👋 Left **{channel_name}**.")
 
 
-
 @bot.command(name="move")
 async def move(ctx, *, channel_name: str):
-    """Move the bot to another voice channel by name."""
     if ctx.voice_client is None:
         return await ctx.send("❌ I'm not in a voice channel. Use `!join` first.")
 
@@ -80,7 +65,6 @@ async def move(ctx, *, channel_name: str):
 
 @bot.command(name="status")
 async def status(ctx):
-    """Show whether the bot is in a voice channel."""
     if ctx.voice_client and ctx.voice_client.is_connected():
         channel = ctx.voice_client.channel
         members = [m for m in channel.members if not m.bot]
@@ -95,7 +79,6 @@ async def status(ctx):
 
 @bot.command(name="channels")
 async def channels(ctx):
-    """List all voice channels in the server."""
     voice_channels = [c for c in ctx.guild.channels if isinstance(c, discord.VoiceChannel)]
     if not voice_channels:
         return await ctx.send("❌ No voice channels found in this server.")
@@ -104,28 +87,17 @@ async def channels(ctx):
     await ctx.send(f"📋 **Available voice channels:**\n{listing}")
 
 
-
-# ─── Auto-reconnect if Discord disconnects the bot ──────────────────────────
-
 @bot.event
 async def on_voice_state_update(member, before, after):
-    """
-    If the bot gets unexpectedly disconnected (Discord timeout),
-    attempt to reconnect to the channel it was in.
-    """
     global intentional_disconnect
-    if intentional_disconnect:
-    intentional_disconnect = False
-    return
 
     if member.id != bot.user.id:
-        return  # Only care about the bot's own state
-        global intentional_disconnect
+        return
+
     if intentional_disconnect:
         intentional_disconnect = False
-    return
+        return
 
-    # Bot was disconnected (had a channel before, has none now)
     if before.channel is not None and after.channel is None:
         print(f"⚠️  Bot disconnected from '{before.channel.name}', attempting to reconnect...")
         await asyncio.sleep(3)
