@@ -104,34 +104,6 @@ async def channels(ctx):
     await ctx.send(f"📋 **Available voice channels:**\n{listing}")
 
 
-# ─── Slash Commands (/join, /leave) ─────────────────────────────────────────
-
-@bot.tree.command(name="join", description="Bot joins the voice channel you're currently in")
-async def slash_join(interaction: discord.Interaction):
-    if interaction.user.voice is None:
-        return await interaction.response.send_message("❌ You need to be in a voice channel first.", ephemeral=True)
-
-    channel = interaction.user.voice.channel
-    voice_client = interaction.guild.voice_client
-
-    if voice_client is not None:
-        await voice_client.move_to(channel)
-        await interaction.response.send_message(f"🔄 Moved to **{channel.name}**")
-    else:
-        await channel.connect()
-        await interaction.response.send_message(f"🎙️ Joined **{channel.name}** — I'll stay even if I'm alone.")
-
-
-@bot.tree.command(name="leave", description="Bot disconnects from the voice channel")
-async def slash_leave(interaction: discord.Interaction):
-    voice_client = interaction.guild.voice_client
-    if voice_client is None:
-        return await interaction.response.send_message("❌ I'm not in any voice channel.", ephemeral=True)
-
-    channel_name = voice_client.channel.name
-    await voice_client.disconnect()
-    await interaction.response.send_message(f"👋 Left **{channel_name}**.")
-
 
 # ─── Auto-reconnect if Discord disconnects the bot ──────────────────────────
 
@@ -151,7 +123,7 @@ async def on_voice_state_update(member, before, after):
         global intentional_disconnect
     if intentional_disconnect:
         intentional_disconnect = False
-        return
+    return
 
     # Bot was disconnected (had a channel before, has none now)
     if before.channel is not None and after.channel is None:
