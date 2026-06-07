@@ -48,6 +48,10 @@ async def join(ctx):
 async def fella(ctx):
     await ctx.send("I main King")
 
+@bot.command(name="aura") 
+async def fella(ctx):
+    await ctx.send("https://tenor.com/view/tuco-salamanca-breaking-bad-avengers-thanos-gif-11017392955177554453")
+
 
 
 @bot.command(name="leave", aliases=["disconnect", "dc"])
